@@ -1,0 +1,37 @@
+package cn.edu.nnnu.dao.impl;
+
+import cn.edu.nnnu.dao.SystemAdminDao;
+import cn.edu.nnnu.entity.SystemAdmin;
+import cn.edu.nnnu.util.JDBCUtil;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class SystemAdminDaoImpl implements SystemAdminDao {
+    @Override
+    public SystemAdmin findByUsername(String username) {
+        Connection connection = JDBCUtil.getConnection();
+        String sql = "select * from system_admin where username= '" + username + "'";
+        PreparedStatement statement = null;
+        ResultSet resultSet = null;
+        try {
+            statement = connection.prepareStatement(sql);
+            resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                int id = resultSet.getInt(1);
+                username = resultSet.getString(2);
+                String password = resultSet.getString(3);
+                String name = resultSet.getString(4);
+                String telephone = resultSet.getString(5);
+                return new SystemAdmin(id, username, password, name, telephone);
+            }
+        } catch (SQLException throwable) {
+            throwable.printStackTrace();
+        } finally {
+            JDBCUtil.release(connection, statement, resultSet);
+        }
+        return null;
+    }
+}
